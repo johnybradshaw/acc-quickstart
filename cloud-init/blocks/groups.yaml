@@ -1,0 +1,5 @@
+# Create useful groups
+groups:
+  - sudo
+  - docker
+  - webmin

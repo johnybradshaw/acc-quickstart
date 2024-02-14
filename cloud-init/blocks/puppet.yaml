@@ -1,0 +1,24 @@
+# Configure puppet
+puppet:
+  install: false
+#   exec: false # Disable puppet agent as it will run later
+#   conf_file: "/etc/puppet/puppet.conf"
+#   ssl_dir: "/var/lib/puppet/ssl"
+#   conf:
+#     agent:
+#       server: puppet.cloudymccloudface.cloud
+#     ca_cert: |
+#       -----BEGIN PUBLIC KEY-----
+#       MIICIjANBgkqhkiG9w0BAQEFAAOCAg8AMIICCgKCAgEA3Y7tCWj8/0mbFyxLgO7J
+#       JrSjVzi+NmG+X7MIPSU1G96r3i4+ZVrLUo2x26P3gjCAeKeEZAx+0lM4Kjmxyz9I
+#       RxssdDeUcflFseDe+MCuMkm0yNycbdWahm2dcDtut73jXo/RoMzGb5m284vQf+tO
+#       nA2PVyOORTpXEBHGE6pP3M/zOzt3MjVFSbvRWMMKfY9/oW5v0VWdQuuCvdvcLuP5
+#       j9dCvq5sNt+HvwH+OgWdkKyRyf5zHoKIIq9goa6mp7RPg8MyTxWhWBbjbvCImZDi
+#       rAFWHjONyUTw0GDrEBjdzqQvtdARQM8yVY1U8BkFMO+PkqtwMcW1cbRfDwE78ODa
+#       1xXrOSeHdU51Jh8numXiDcxiYluc9RQUz9z3LYiR1tbKPm6cVYOPmiut2qqwh0VQ
+#       GziHuKAWmYLJCSC0+E3AMzosjleCOGZ/YlEYOCSpooi8xO5YvFFSrrYfPhu1f9WJ
+#       hcAHZvbyqacLuep2wqF5ovxzFxFxhDZ8N2yfpZBtsHFveGTpSSiYhR6GBWhAk3N+
+#       PqGjLctNYKrW5MHG75/0RxZNP4NE45rve0z7ssWDHZvCcRqHemANr/8U7pDfQxcq
+#       tDYtF1dZe/DBrx8rmARMf2wZmgTOOhBdekpWyJuA3D1ycgepPvV/ay4DTpi0WmXc
+#       Qe5pEgfTIWRVOUOf/JtdKzsCAwEAAQ==
+#       -----END PUBLIC KEY-----

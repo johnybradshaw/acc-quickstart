@@ -1,0 +1,32 @@
+# Install updates and packages on first boot
+package_update: true
+package_upgrade: true
+package_reboot_if_required: true
+packages:
+  # Security packages
+  - apparmor
+  - apparmor-profiles
+  - apparmor-utils
+  - auditd
+  - audispd-plugins
+  - fail2ban
+  - unattended-upgrades
+  - rkhunter
+  - clamav
+  - clamav-daemon
+  - clamav-freshclam
+  - ufw
+  - aide
+  # Utilities
+  - neofetch
+  - tldr
+  - htop
+  - jq
+  - curl
+  - tmux
+  - xkcdpass
+  - mosh
+  - bat
+  # Webmin support
+  - apache2 # Required for certbot
+  - certbot # Enables Let's Encrypt

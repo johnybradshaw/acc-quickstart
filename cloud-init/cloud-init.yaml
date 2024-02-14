@@ -1,0 +1,26 @@
+#cloud-config
+# Set the hostname
+preserve_hostname: false
+
+# Regenerate the random_seed
+random_seed:
+  file: /dev/urandom
+  command: ["pollinate", "-r"]
+  command_required: true
+
+manage_etc_hosts: localhost # Update /etc/hosts with hostname
+
+final_message: |
+  cloud-init has finished
+  version: $version
+  timestamp: $timestamp
+  datasource: $datasource
+  uptime: $uptime
+
+# Reboot the system after Cloud-Init completes
+power_state:
+  delay: now
+  mode: reboot
+  message: "Reboot after Cloud-Init completion"
+  timeout: 30
+  condition: True

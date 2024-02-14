@@ -1,0 +1,22 @@
+# Create users
+users:
+  - name: acc-user  
+    groups: sudo, docker, users, admin
+    primary_group: acc-user
+    gecos: Default Akamai Connected Cloud User
+    sudo: ALL=(ALL) NOPASSWD:ALL
+    shell: /bin/bash
+    ssh_authorized_keys:
+      ${ssh_public_keys}
+    # ssh_import_id:
+    #   - gh:${github_username}
+    lock_passwd: true
+
+# Change deault passwords
+chpasswd:
+  expire: false
+  users:
+    - name: root
+      type: RANDOM
+    - name: ubuntu
+      type: RANDOM

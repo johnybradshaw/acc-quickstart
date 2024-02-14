@@ -1,0 +1,88 @@
+runcmd:
+  # Activate NordVPN
+  # - sh <(curl -sSf https://downloads.nordcdn.com/apps/linux/install.sh)
+  # - nordvpn login --token ${nordvpn_token}
+  # - nordvpn set autoconnect yes
+
+  # Set the hostname
+  - /usr/local/bin/set-hostname.sh
+  
+  # Disable ctrl-alt-del
+  - ['systemctl', 'mask', 'ctrl-alt-del.target']
+  - ['systemctl', 'daemon-reload']
+
+  # Disable root login
+  - sed -i 's/PermitRootLogin yes/PermitRootLogin no/g' /etc/ssh/sshd_config # Disable root login
+  - echo "PermitRootLogin no" >> /etc/ssh/sshd_config.d/10-ssh.conf # Disable root login
+  - echo "PasswordAuthentication no" >> /etc/ssh/sshd_config.d/10-ssh.conf # Disable password login
+  - echo "PermitEmptyPasswords no" >> /etc/ssh/sshd_config.d/10-ssh.conf # Disable password login
+  - systemctl restart sshd
+
+  # Configure fail2ban
+  - echo "[DEFAULT]\nbantime = 3600\nfindtime = 600\nmaxretry = 3" > /etc/fail2ban/jail.local
+  - echo "[sshd]\nenabled = true\nport = ssh\nfilter = sshd\nlogpath = /var/log/auth.log\nmaxretry = 3" >> /etc/fail2ban/jail.local
+  - echo "[sshd-ddos]\nenabled = true\nport = ssh\nfilter = sshd-ddos\nlogpath = /var/log/auth.log\nmaxretry = 3" >> /etc/fail2ban/jail.local
+  - echo "[apache-auth]\nenabled = true\nport = http,https\nfilter = apache-auth\nlogpath = /var/log/apache2/*error.log\nmaxretry = 3" >> /etc/fail2ban/jail.local
+  - echo "[apache-badbots]\nenabled = true\nport = http,https\nfilter = apache-badbots\nlogpath = /var/log/apache2/*access.log\nmaxretry = 3" >> /etc/fail2ban/jail.local
+  - echo "[apache-noscript]\nenabled = true\nport = http,https\nfilter = apache-noscript\nlogpath = /var/log/apache2/*error.log\nmaxretry = 3" >> /etc/fail2ban/jail.local
+  - echo "[apache-overflows]\nenabled = true\nport = http,https\nfilter = apache-overflows\nlogpath = /var/log/apache2/*error.log\nmaxretry = 3" >> /etc/fail2ban/jail.local
+  - echo "[apache-nohome]\nenabled = true\nport = http,https\nfilter = apache-nohome\nlogpath = /var/log/apache2/*error.log\nmaxretry = 3" >> /etc/fail2ban/jail.local
+  - echo "[apache-botsearch]\nenabled = true\nport = http,https\nfilter = apache-botsearch\nlogpath = /var/log/apache2/*access.log\nmaxretry = 3" >> /etc/fail2ban/jail.local
+  - echo "[apache-fakegooglebot]\nenabled = true\nport = http,https\nfilter = apache-fakegooglebot\nlogpath = /var/log/apache2/*access.log\nmaxretry = 3" >> /etc/fail2ban/jail.local
+  - echo "[apache-modsecurity]\nenabled = true\nport = http,https\nfilter = apache-modsecurity\nlogpath = /var/log/apache2/*error.log\nmaxretry = 3" >> /etc/fail2ban/jail.local
+  - echo "[apache-shellshock]\nenabled = true\nport = http,https\nfilter = apache-shellshock\nlogpath = /var/log/apache2/*error.log\nmaxretry = 3" >> /etc/fail2ban/jail.local
+  - echo "[apache-shellshock-common]\nenabled = true\nport = http,https\nfilter = apache-shellshock-common\nlogpath = /var/log/apache2/*error.log\nmaxretry = 3" >> /etc/fail2ban/jail.local
+  - echo "[apache-shellshock-ip]\nenabled = true\nport = http,https\nfilter = apache-shellshock-ip\nlogpath = /var/log/apache2/*error.log\nmaxretry = 3" >> /etc/fail2ban/jail.local
+  - echo "[webmin-auth]\nenabled = true\nport = 10000\nfilter = webmin-auth\nlogpath = /var/log/auth.log\nmaxretry = 3" >> /etc/fail2ban/jail.local
+  - ['systemctl', 'enable', 'fail2ban', '--now']
+
+  # Generate a random password for root and set it
+  - echo "root:$(< /dev/urandom tr -dc _A-Z-a-z-0-9 | head -c$${1:-64})" | chpasswd
+
+  # Configure unattended-upgrades to run hourly
+  - echo "APT::Periodic::Update-Package-Lists \"1\";" > /etc/apt/apt.conf.d/20auto-upgrades
+  - echo "APT::Periodic::Download-Upgradeable-Packages \"1\";" >> /etc/apt/apt.conf.d/20auto-upgrades
+  - echo "APT::Periodic::AutocleanInterval \"7\";" >> /etc/apt/apt.conf.d/20auto-upgrades
+  - echo "APT::Periodic::Unattended-Upgrade \"1\";" >> /etc/apt/apt.conf.d/20auto-upgrades
+  - (crontab -l 2>/dev/null; echo "0 * * * * /usr/bin/unattended-upgrade") | crontab -
+
+  # Configure rkhunter
+  - rkhunter --propupd
+  - rkhunter --update
+
+  # Configure UFW
+  - ufw allow ssh
+  - ufw allow http # Required for apache2 & letsencrypt
+  - ufw allow https # Required for apache2 & letsencrypt
+  - ufw allow 10000/tcp # Webmin
+  - ufw allow mosh # mosh
+  - ufw enable
+
+  # Install Webmin
+  - curl -o setup-repos.sh https://raw.githubusercontent.com/webmin/webmin/master/setup-repos.sh
+  - echo y | sh setup-repos.sh
+  - apt-get install webmin --install-recommends -y
+  - apt update
+  - apt upgrade -y
+
+  # Install docker
+  - curl -fsSL https://get.docker.com | sh
+
+  # Update tl;dr
+  - sudo --user=acc-user tldr -u
+
+  # Disable update-motd.d
+  - chmod -x /etc/update-motd.d/00-header
+  - chmod -x /etc/update-motd.d/10-help-text
+
+  # Activate AppArmor
+  - ['aa-enabled', '&&', 'echo', '"AppArmor is enabled."', '||', 'echo', '"AppArmor is not enabled."']
+  - ['aa-complain', '/etc/apparmor.d/*'] # Set all profiles to complain mode
+
+  # Activate aide
+  - aideinit
+  - (crontab -l 2>/dev/null; echo "0 2 * * * /usr/bin/aide --config /etc/aide/aide.conf --check") | crontab -
+
+  # Activate USG
+  - ${ubuntu_usg_install}
+  - ${ubuntu_usg_fix}

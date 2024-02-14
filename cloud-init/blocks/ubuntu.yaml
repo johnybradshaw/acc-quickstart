@@ -1,0 +1,14 @@
+# Ubuntu specific settings
+ubuntu_advantage:
+  token: "${ubuntu_advantage_token}"
+  enable:
+    - usg
+    - esm-apps
+    - esm-infra
+    - livepatch
+
+# Install snap packages
+snap:
+  commands:
+    - ['install', 'canonical-livepatch']
+    - ['install', 'linode-cli']

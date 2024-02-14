@@ -1,0 +1,14 @@
+# Secure the system
+ssh_pwauth: false # Disable password authentication
+disable_root: true # Disable root login
+no_ssh_fingerprints: true # Supress SSH key fingerprints in console
+ssh_deletekeys: true
+ssh_genkeytypes: [ed25519]
+disable_root_opts: no-port-forwarding,no-agent-forwarding,no-X11-forwarding
+allow_public_ssh_keys: true
+ssh_quiet_keygen: true
+ssh_publish_hostkeys:
+  enabled: true
+  blacklist: [dsa]
+ssh:
+  emit_keys_to_console: false # Set to true to print SSH host keys to console
